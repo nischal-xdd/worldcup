@@ -1,6 +1,0 @@
-{
-  "name": "FIFA World Cup Live & Scores",
-  "description": "A premium FIFA World Cup live matches, scores, standings, teams, and stadiums platform featuring real-time screen-shared live streaming.",
-  "requestFramePermissions": ["display-capture"],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
