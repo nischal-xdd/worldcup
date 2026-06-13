@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIFA World Cup Live 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <style>
+        .fifa-gradient {
+            background: linear-gradient(135deg, #020617 0%, #0f172a 100%);
+        }
+        /* Custom scrollbar for stream list */
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="fifa-gradient text-slate-100 min-h-screen font-sans flex flex-col justify-between">
+
+    <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40 shadow-lg">
+        <div class="max-w-7xl px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between mx-auto w-full">
+            <div id="logo-trigger" class="flex items-center gap-3 cursor-pointer select-none active:scale-95 transition-transform" onclick="handleLogoClick()">
+                <div class="w-12 h-12 bg-gradient-to-tr from-amber-500 to-red-600 rounded-full flex items-center justify-center shadow-lg shadow-red-900/40">
+                    <i class="fa-solid fa-trophy text-xl text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">FIFA WORLD CUP</h1>
+                    <p class="text-xs font-bold text-amber-500 tracking-widest uppercase">Live 2026</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4 bg-slate-950/50 px-4 py-2 rounded-xl border border-slate-800">
+                <span class="flex h-3 w-3 relative">
+                    <span id="live-ping" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span id="live-dot" class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                </span>
+                <span id="live-status-text" class="text-xs font-semibold tracking-wider text-slate-400 uppercase">System Ready</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl w-full px-4 sm:px-6 lg:px-8 py-10 mx-auto flex-grow flex flex-col justify-center">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            
+            <div class="lg:col-span-2 space-y-4">
+                <div class="aspect-video w-full rounded-2xl overflow-hidden shadow-2xl border border-slate-800 bg-black relative group">
+                    <iframe id="main-player" class="w-full h-full hidden" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    
+                    <video id="screen-player" class="w-full h-full object-contain hidden" autoplay playsinline controls></video>
+
+                    <div id="fallback-screen" class="w-full h-full flex flex-col items-center justify-center bg-slate-950 text-slate-500 p-6 text-center">
+                        <i class="fa-solid fa-circle-exclamation text-4xl mb-3 text-slate-700 animate-bounce"></i>
+                        <h4 class="text-lg font-bold text-slate-400">No Target Stream Broadcaster Running</h4>
+                        <p class="text-xs max-w-sm mt-1">Select an active feed from the list to begin streaming, or wait for the host administrator to deploy a screen capture broadcast.</p>
+                    </div>
+                </div>
+                
+                <div class="flex justify-between items-center p-2 bg-slate-900/30 rounded-xl border border-slate-800/50 px-4 py-3">
+                    <div>
+                        <span id="badge-status" class="bg-red-600 text-[10px] font-extrabold px-2 py-1 rounded tracking-widest mr-3">LIVE</span>
+                        <h2 id="stream-title" class="text-base sm:text-lg font-bold inline-block text-white">Loading Dynamic Configuration Feed...</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/50 border border-slate-800 rounded-2xl p-6 backdrop-blur-sm h-[430px] flex flex-col shadow-xl">
+                <h3 class="text-xs font-bold text-slate-400 tracking-widest uppercase mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-list-ul text-amber-500"></i> Server Content Pipelines
+                </h3>
+                <div id="links-container" class="space-y-3 overflow-y-auto pr-1 flex-grow custom-scroll">
+                    </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="bg-slate-950/80 border-t border-slate-900 py-6 text-center">
+        <p class="text-sm text-slate-500 font-medium">&copy; 2026 FIFA World Cup Live. All rights reserved.</p>
+        <p class="text-xs text-slate-600 mt-1 tracking-widest uppercase">Created by <span class="text-slate-400 font-semibold">Nischal Adk</span></p>
+    </footer>
+
+    <div id="login-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden items-center justify-center z-50 p-4 animate-fadeIn">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl">
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 bg-amber-500/10 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i class="fa-solid fa-unlock-keyhole text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white">Gatekeeper Protocol</h3>
+                <p class="text-xs text-slate-400 mt-1">Provide admin credentials to unpack configurations</p>
+            </div>
+            <form onsubmit="verifyPassword(event)" class="space-y-4">
+                <input type="password" id="admin-pass" placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-amber-500 text-center tracking-widest font-mono text-lg">
+                <p id="login-error" class="text-xs text-red-400 text-center font-medium hidden">⚠️ Access Denied: Incorrect Security Token</p>
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeModal('login-modal')" class="w-1/2 bg-slate-800 text-slate-300 hover:bg-slate-700 py-2.5 rounded-xl text-sm font-semibold transition-colors">Abort</button>
+                    <button type="submit" class="w-1/2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-xl text-sm transition-colors shadow-lg shadow-amber-500/20">Decrypt</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="admin-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden items-center justify-center z-50 p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl p-6 shadow-2xl max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-4 mb-4">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-screwdriver-wrench text-amber-500"></i>
+                    <h3 class="text-lg font-bold text-white">Live Broadcast Controller</h3>
+                </div>
+                <button onclick="closeModal('admin-modal')" class="text-slate-400 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <div class="overflow-y-auto flex-grow space-y-6 pr-1 custom-scroll">
+                <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
+                    <h4 class="text-xs font-bold text-amber-400 uppercase tracking-widest"><i class="fa-solid fa-tower-broadcast mr-1"></i> Screen Capture P2P Engine</h4>
+                    <p class="text-xs text-slate-400">Pipe your immediate media array windows or direct applications directly into current viewer canvas arrays.</p>
+                    <div class="flex gap-3">
+                        <button id="start-share-btn" onclick="startScreenShare()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-colors shadow-lg shadow-emerald-900/20">
+                            <i class="fa-solid fa-display"></i> Deploy Screen Share
+                        </button>
+                        <button id="stop-share-btn" onclick="stopScreenShare()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-colors hidden shadow-lg shadow-red-900/20">
+                            <i class="fa-solid fa-stop"></i> Terminate Feed Stream
+                        </button>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Append Video Source Link</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <input type="text" id="new-title" placeholder="Feed Identifier Name (e.g. Server 3)" class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-amber-500 transition-colors">
+                        <input type="text" id="new-url" placeholder="YouTube URL or String Key ID" class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-amber-500 transition-colors">
+                    </div>
+                    <button onclick="addNewLink()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2.5 rounded-xl text-xs uppercase tracking-widest border border-slate-700 transition-colors">
+                        Inject To Server Track Array
+                    </button>
+                </div>
+
+                <div class="border-t border-slate-800 pt-4">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Live Feed Configurations Inventory</label>
+                    <div id="admin-links-list" class="space-y-2">
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let clickCount = 0;
+        let clickTimeout;
+        const TARGET_CLICKS = 5; 
+
+        // Isolated signaling instance key unique room signature 
+        const PEER_SIGN_ROOM_ID = "fifa2026_global_p2p_channel_broadcast_id";
+        let peerInstance = null;
+        let localScreenStream = null;
+        let activeCallObj = null;
+
+        const fallbackStreams = [
+            { id: "stream_1", title: "Main Stadium Feed (Server 1)", ytId: "dQw4w9WgXcQ", type: "youtube" },
+            { id: "stream_2", title: "Tactical Arena-Cam (Server 2)", ytId: "9bZkp7q19f0", type: "youtube" }
+        ];
+
+        let streams = JSON.parse(localStorage.getItem('fifa_streams_v2')) || fallbackStreams;
+        let activeStreamId = localStorage.getItem('active_stream_id_v2') || streams[0].id;
+
+        function getYouTubeId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : url;
+        }
+
+        function initApp() {
+            renderStreams();
+            loadActiveStream();
+            initClientReceiverNode();
+        }
+
+        // CLIENT ENGINE WORKFLOW: Listen out for active Admin transmissions
+        function initClientReceiverNode() {
+            if(peerInstance) return;
+            
+            // Instantiates client receiver under a unique, random string signature ID
+            peerInstance = new Peer('user_' + Math.floor(Math.random() * 999999));
+            
+            peerInstance.on('open', () => {
+                // If client wakes up and active stream points to screen share, pull the pipeline track
+                const active = streams.find(s => s.id === activeStreamId);
+                if (active && active.type === 'webrtc') {
+                    dialToHostBroadcastRoom();
+                }
+            });
+
+            peerInstance.on('call', (incomingCall) => {
+                incomingCall.answer(); 
+                incomingCall.on('stream', (incomingStream) => {
+                    displayLiveScreenTrack(incomingStream);
+                });
+            });
+
+            peerInstance.on('error', (err) => {
+                console.warn("Peer Network Warning: ", err.type);
+            });
+        }
+
+        function dialToHostBroadcastRoom() {
+            if(!peerInstance || peerInstance.destroyed) return;
+            
+            // Ping and dial handshake out to the central admin broadcast signaling host node
+            let call = peerInstance.call(PEER_SIGN_ROOM_ID, new MediaStream());
+            if(call) {
+                call.on('stream', (remoteStream) => {
+                    displayLiveScreenTrack(remoteStream);
+                });
+            }
+        }
+
+        function displayLiveScreenTrack(streamObj) {
+            const ytPlayer = document.getElementById('main-player');
+            const screenPlayer = document.getElementById('screen-player');
+            const fallbackScreen = document.getElementById('fallback-screen');
+            
+            ytPlayer.classList.add('hidden');
+            fallbackScreen.classList.add('hidden');
+            screenPlayer.classList.remove('hidden');
+            
+            screenPlayer.srcObject = streamObj;
+            document.getElementById('stream-title').innerText = "🔴 HQ Live Admin Screen Broadcast Feed";
+            
+            document.getElementById('live-ping').classList.replace('bg-emerald-400', 'bg-red-400');
+            document.getElementById('live-dot').classList.replace('bg-emerald-500', 'bg-red-500');
+            document.getElementById('live-status-text').innerText = "LIVE FEEDS RUNNING";
+            document.getElementById('live-status-text').classList.add('text-red-400');
+        }
+
+        // ADMIN ENGINE CONTROL: Acquire UI display window and shift network topology to Host
+        async function startScreenShare() {
+            try {
+                localScreenStream = await navigator.mediaDevices.getDisplayMedia({
+                    video: { cursor: "always" },
+                    audio: true
+                });
+
+                // Tear down existing client configurations to capture standard channel signature ID
+                if (peerInstance) {
+                    peerInstance.destroy();
+                    peerInstance = null;
+                }
+
+                // Re-bind network peer instance directly onto the master central broadcasting ID
+                peerInstance = new Peer(PEER_SIGN_ROOM_ID);
+
+                peerInstance.on('open', () => {
+                    document.getElementById('start-share-btn').classList.add('hidden');
+                    document.getElementById('stop-share-btn').classList.remove('hidden');
+                    
+                    // Inject screen share configuration parameters into storage array dynamically
+                    if(!streams.some(s => s.id === 'admin_screen_live')) {
+                        streams.unshift({ id: 'admin_screen_live', title: "🔴 Admin Live Screen-Share", ytId: "", type: "webrtc" });
+                    }
+                    activeStreamId = 'admin_screen_live';
+                    saveState();
+                    renderStreams();
+                    displayLiveScreenTrack(localScreenStream);
+                });
+
+                // When user terminals call the host endpoint, push down the active desktop media stream
+                peerInstance.on('call', (incomingUserCall) => {
+                    incomingUserCall.answer(localScreenStream);
+                });
+
+                localScreenStream.getVideoTracks()[0].onended = () => {
+                    stopScreenShare();
+                };
+
+            } catch (err) {
+                console.error("Hardware Capture Interface Rejected: ", err);
+                alert("Failed to capture system interface window.");
+            }
+        }
+
+        function stopScreenShare() {
+            if (localScreenStream) {
+                localScreenStream.getTracks().forEach(track => track.stop());
+                localScreenStream = null;
+            }
+
+            streams = streams.filter(s => s.id !== 'admin_screen_live');
+            activeStreamId = streams[0]?.id || "";
+            
+            document.getElementById('start-share-btn').classList.remove('hidden');
+            document.getElementById('stop-share-btn').classList.add('hidden');
+            
+            if (peerInstance) {
+                peerInstance.destroy();
+                peerInstance = null;
+            }
+            
+            saveState();
+            renderStreams();
+            loadActiveStream();
+            
+            // Re-initialize client framework configuration 
+            initClientReceiverNode();
+            
+            document.getElementById('live-ping').classList.replace('bg-red-400', 'bg-emerald-400');
+            document.getElementById('live-dot').classList.replace('bg-red-500', 'bg-emerald-500');
+            document.getElementById('live-status-text').innerText = "System Ready";
+            document.getElementById('live-status-text').classList.remove('text-red-400');
+        }
+
+        // ROUTINE RENDER SYSTEMS
+        function renderStreams() {
+            const container = document.getElementById('links-container');
+            const adminContainer = document.getElementById('admin-links-list');
+            
+            container.innerHTML = '';
+            adminContainer.innerHTML = '';
+
+            streams.forEach(stream => {
+                const isActive = stream.id === activeStreamId;
+                
+                const item = document.createElement('button');
+                item.className = `w-full text-left p-4 rounded-xl border transition-all flex items-center justify-between ${
+                    isActive 
+                    ? 'bg-amber-500/10 border-amber-500 text-amber-400 font-semibold shadow-md' 
+                    : 'bg-slate-900/40 border-slate-800 hover:bg-slate-800/50 text-slate-300'
+                }`;
+                item.onclick = () => selectStream(stream.id);
+                item.innerHTML = `
+                    <div class="flex items-center gap-3 truncate">
+                        <i class="fa-solid ${stream.type === 'webrtc' ? 'fa-broadcast-tower text-red-500 animate-pulse' : (isActive ? 'fa-circle-dot text-amber-500' : 'fa-play text-slate-500')} text-xs"></i>
+                        <span class="truncate text-sm tracking-wide">${stream.title}</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-xs opacity-40"></i>
+                `;
+                container.appendChild(item);
+
+                if (stream.id !== 'admin_screen_live') {
+                    const adminItem = document.createElement('div');
+                    adminItem.className = "flex items-center justify-between bg-slate-950 p-3 rounded-xl border border-slate-800 text-sm";
+                    adminItem.innerHTML = `
+                        <div class="truncate pr-4">
+                            <p class="font-semibold text-slate-200 truncate">${stream.title}</p>
+                            <p class="text-xs text-slate-500 truncate">YouTube Parameter Key: ${stream.ytId}</p>
+                        </div>
+                        <button onclick="deleteStream('${stream.id}')" class="text-red-400 hover:text-red-500 p-2 transition-colors"><i class="fa-solid fa-trash-can"></i></button>
+                    `;
+                    adminContainer.appendChild(adminItem);
+                }
+            });
+        }
+
+        function loadActiveStream() {
+            const ytPlayer = document.getElementById('main-player');
+            const screenPlayer = document.getElementById('screen-player');
+            const fallbackScreen = document.getElementById('fallback-screen');
+
+            const active = streams.find(s => s.id === activeStreamId);
+            
+            if (!active) {
+                ytPlayer.classList.add('hidden');
+                screenPlayer.classList.add('hidden');
+                fallbackScreen.classList.remove('hidden');
+                document.getElementById('stream-title').innerText = "Empty Server Stack Matrix";
+                return;
+            }
+
+            if (active.type === "webrtc") {
+                if (localScreenStream) {
+                    displayLiveScreenTrack(localScreenStream);
+                } else {
+                    dialToHostBroadcastRoom();
+                }
+            } else {
+                screenPlayer.classList.add('hidden');
+                fallbackScreen.classList.add('hidden');
+                ytPlayer.classList.remove('hidden');
+                
+                ytPlayer.src = `https://www.youtube.com/embed/${active.ytId}?autoplay=1&mute=1`;
+                document.getElementById('stream-title').innerText = active.title;
+            }
+        }
+
+        function selectStream(id) {
+            activeStreamId = id;
+            localStorage.setItem('active_stream_id_v2', id);
+            renderStreams();
+            loadActiveStream();
+        }
+
+        // RESETTABLE TIME SENSITIVE TRIGGER KEY LISTENER
+        function handleLogoClick() {
+            clickCount++;
+            clearTimeout(clickTimeout);
+            
+            // Provides a window of 2 seconds to fulfill the 5 sequential click triggers
+            clickTimeout = setTimeout(() => { clickCount = 0; }, 2000);
+
+            if (clickCount === TARGET_CLICKS) {
+                clickCount = 0;
+                openModal('login-modal');
+            }
+        }
+
+        function verifyPassword(e) {
+            e.preventDefault();
+            const passInput = document.getElementById('admin-pass');
+            const errMsg = document.getElementById('login-error');
+
+            if (passInput.value === "123") {
+                passInput.value = "";
+                errMsg.classList.add('hidden');
+                closeModal('login-modal');
+                openModal('admin-modal');
+            } else {
+                errMsg.classList.remove('hidden');
+                passInput.classList.add('border-red-500', 'animate-shake');
+                setTimeout(() => passInput.classList.remove('border-red-500', 'animate-shake'), 500);
+            }
+        }
+
+        function addNewLink() {
+            const titleInput = document.getElementById('new-title');
+            const urlInput = document.getElementById('new-url');
+
+            if (!titleInput.value.trim() || !urlInput.value.trim()) {
+                alert("Both Title name and URL properties are essential.");
+                return;
+            }
+
+            const ytId = getYouTubeId(urlInput.value.trim());
+            streams.push({
+                id: 'stream_' + Date.now(),
+                title: titleInput.value.trim(),
+                ytId: ytId,
+                type: 'youtube'
+            });
+
+            saveState();
+            titleInput.value = ""; urlInput.value = "";
+            renderStreams();
+        }
+
+        function deleteStream(id) {
+            streams = streams.filter(s => s.id !== id);
+            if (activeStreamId === id) activeStreamId = streams[0]?.id || "";
+            saveState();
+            renderStreams();
+            loadActiveStream();
+        }
+
+        function saveState() {
+            localStorage.setItem('fifa_streams_v2', JSON.stringify(streams));
+            localStorage.setItem('active_stream_id_v2', activeStreamId);
+        }
+
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // Close interfaces on hardware press of Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === "Escape") {
+                closeModal('login-modal');
+                closeModal('admin-modal');
+            }
+        });
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>

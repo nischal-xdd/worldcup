@@ -1,0 +1,275 @@
+/* Design tokens per DESIGN.md — light editorial system */
+:root {
+  --primary: #000000;
+  --primary-active: #1a1a1a;
+  --text-link: #0d74ce;
+  --ink: #171717;
+  --body: #60646c;
+  --muted: #999999;
+  --hairline: #f0f0f3;
+  --hairline-strong: #dcdee0;
+  --canvas: #ffffff;
+  --canvas-soft: #fafafa;
+  --surface-card: #ffffff;
+  --surface-strong: #f0f0f3;
+  --surface-dark: #171717;
+  --on-primary: #ffffff;
+  --sky-light: #cfe7ff;
+  --sky-mid: #a8c8e8;
+  --success: #16a34a;
+  --error: #eb8e90;
+
+  --r-md: 8px;   /* CTAs, inputs */
+  --r-lg: 12px;  /* cards */
+  --r-pill: 9999px; /* badges only */
+
+  --font-sans: 'Inter', -apple-system, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  background: var(--canvas);
+  color: var(--ink);
+}
+
+/* Hero — sky-blue gradient atmospheric wash, hero only */
+.hero {
+  background:
+    radial-gradient(ellipse 80% 90% at 50% -10%, var(--sky-light) 0%, var(--sky-mid) 45%, rgba(255,255,255,0) 100%),
+    var(--canvas);
+  padding: 96px 24px 80px;
+  text-align: center;
+}
+.hero-inner { max-width: 1200px; margin: 0 auto; }
+
+/* badge-pill: surface-strong, caption-uppercase, pill radius */
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.88px;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--surface-strong);
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  margin-bottom: 24px;
+}
+
+/* display-mega */
+.hero h1 {
+  font-size: clamp(32px, 6vw, 64px);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -1.92px;
+  color: var(--ink);
+}
+@media (max-width: 640px) { .hero h1 { letter-spacing: -0.96px; } }
+.hero p { color: var(--body); margin-top: 16px; font-size: 16px; }
+
+/* Tabs — nav-link type, black fill for the active (CTA dialect, 8px radius) */
+.tabs {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  height: auto;
+  min-height: 64px;
+  align-items: center;
+  padding: 12px 24px;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--hairline);
+}
+.tab {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--body);
+  padding: 10px 18px;
+  height: 40px;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: color .15s, background .15s;
+}
+.tab:hover { color: var(--ink); background: var(--surface-strong); }
+.tab.active { color: var(--on-primary); background: var(--primary); }
+.tab.active:active { background: var(--primary-active); }
+
+/* Layout — 1200px cap, 96px section rhythm */
+.container { max-width: 1200px; margin: 0 auto; padding: 48px 24px 96px; }
+.panel { display: none; }
+.panel.active { display: block; animation: fade .25s ease; }
+@keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+/* display-lg for section heads */
+.panel h2 {
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -1.08px;
+  margin-bottom: 24px;
+  color: var(--ink);
+}
+.panel-head h2 { margin-bottom: 0; }
+
+/* text-input: 8px radius, hairline-strong border, focus 2px ink */
+input[type=search] {
+  font-family: var(--font-sans);
+  background: var(--surface-card);
+  border: 1px solid var(--hairline-strong);
+  color: var(--ink);
+  padding: 12px 16px;
+  height: 44px;
+  border-radius: var(--r-md);
+  font-size: 16px;
+  min-width: 240px;
+  outline: none;
+}
+input[type=search]:focus { border: 2px solid var(--ink); padding: 11px 15px; }
+input[type=search]::placeholder { color: var(--muted); }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+.teams-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+
+/* feature-card: white, hairline-strong border, 12px radius, soft drop on hover */
+.card {
+  background: var(--surface-card);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--r-lg);
+  padding: 24px;
+  transition: box-shadow .15s, transform .15s;
+}
+.card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04); transform: translateY(-2px); }
+
+/* Matches */
+.match-teams {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--ink);
+}
+.match-team { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.match-team-away { justify-content: flex-end; text-align: right; }
+.match-vs { color: var(--muted); font-size: 13px; font-weight: 500; }
+.match-score {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--on-primary);
+  background: var(--surface-dark);
+  border-radius: var(--r-md);
+  padding: 4px 10px;
+}
+.match-meta { color: var(--body); font-size: 13px; margin-top: 14px; display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.match-meta span { display: inline-flex; align-items: center; gap: 5px; }
+
+/* Inline SVG icons */
+.icon { width: 14px; height: 14px; flex: none; color: var(--muted); }
+
+/* Teams */
+.team-card { text-align: center; padding: 24px 14px; }
+.team-flag { display: flex; justify-content: center; margin-bottom: 10px; }
+.flag {
+  height: 38px;
+  width: auto;
+  border-radius: 4px;
+  border: 1px solid var(--hairline-strong);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+.flag-sm { height: 14px; border-radius: 2px; box-shadow: none; }
+.flag-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  width: 56px;
+  border-radius: 4px;
+  background: var(--surface-strong);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.88px;
+}
+.team-name { font-weight: 600; font-size: 16px; color: var(--ink); }
+.team-group { color: var(--muted); font-size: 13px; margin-top: 4px; }
+
+/* Groups */
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--hairline); }
+td { color: var(--body); }
+td:first-child { color: var(--ink); font-weight: 500; }
+th {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.88px;
+  text-transform: uppercase;
+}
+td.num, th.num { text-align: center; }
+td.num { font-family: var(--font-mono); font-size: 13px; }
+.group-title { font-size: 18px; font-weight: 600; line-height: 1.4; margin-bottom: 12px; color: var(--ink); }
+
+/* Stadiums */
+.stadium-card { padding: 0; overflow: hidden; }
+.stadium-banner {
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.stadium-banner .bx { font-size: 52px; color: rgba(255, 255, 255, 0.92); }
+.banner-us { background: linear-gradient(135deg, #1e3a8a, #3b82f6); }
+.banner-mx { background: linear-gradient(135deg, #14532d, #22c55e); }
+.banner-ca { background: linear-gradient(135deg, #7f1d1d, #ef4444); }
+.stadium-body { padding: 20px 24px 24px; }
+.stadium-name { font-weight: 600; font-size: 18px; color: var(--ink); }
+.stadium-meta { color: var(--body); font-size: 14px; margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+.stadium-meta span { display: inline-flex; align-items: center; gap: 6px; }
+.cap-bar { margin-top: 14px; height: 6px; border-radius: 3px; background: var(--surface-strong); overflow: hidden; }
+.cap-bar span { display: block; height: 100%; border-radius: 3px; background: var(--ink); }
+
+/* States */
+.state { text-align: center; color: var(--body); padding: 50px 20px; grid-column: 1 / -1; }
+.error { color: var(--error); }
+
+/* Footer — light, body-sm */
+.footer {
+  text-align: center;
+  color: var(--body);
+  padding: 64px 48px;
+  border-top: 1px solid var(--hairline);
+  font-size: 14px;
+  background: var(--canvas);
+}
+.footer code {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-link);
+}

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FIFA World Cup 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <span class="badge"><h2>CREATED BY NISCHAL ADHIKARI</h2></span>
+      <h1>FIFA World Cup 2026</h1>
+      <h2>June 11 - July 19, 2026</h2>
+      <h3>Get ready for the biggest football event in history!</h3>
+      <p>48 teams · 16 stadiums · the biggest World Cup ever played.</p>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-tab="matches">Matches</button>
+    <button class="tab" data-tab="groups">Groups</button>
+    <button class="tab" data-tab="teams">Teams</button>
+    <button class="tab" data-tab="stadiums">Stadiums</button>
+     <a href="live.html"><button class="tab" data-tab="live">Live</button></a>
+  </nav>
+
+  <main class="container">
+    <section id="panel-matches" class="panel active">
+      <div class="panel-head">
+        <h2>Matches</h2>
+        <input type="search" id="matches-search" placeholder="Search by team..." />
+      </div>
+      <div id="matches" class="grid"></div>
+    </section>
+
+    <section id="panel-groups" class="panel">
+      <h2>Group Standings</h2>
+      <div id="groups" class="grid"></div>
+    </section>
+
+    <section id="panel-teams" class="panel">
+      <div class="panel-head">
+        <h2>Teams</h2>
+        <input type="search" id="teams-search" placeholder="Search teams..." />
+      </div>
+      <div id="teams" class="grid teams-grid"></div>
+    </section>
+
+    <section id="panel-stadiums" class="panel">
+      <h2>Stadiums</h2>
+      <div id="stadiums" class="grid"></div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
